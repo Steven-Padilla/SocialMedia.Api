@@ -11,7 +11,7 @@ const main = async () => {
     try {
 
         await sequelize.sync();
-        app.listen(process.env.port ||port , () => {
+        app.listen(process.env.PORT ||port , () => {
             console.log('Server running on port ', port)
         })
 
