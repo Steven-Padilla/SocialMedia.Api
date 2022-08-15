@@ -7,10 +7,10 @@ import 'dotenv/config'
 //   dialect: 'postgres'
 // });
 
-export const sequelize = new Sequelize(process.env.DATABASE_URL,{
-  dialectOptions:{
-    ssl:{
-      require:true,
+export const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialectOptions: {
+    ssl: {
+      require: true,
       rejectUnauthorized: false
     }
   }
