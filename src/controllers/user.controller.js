@@ -16,8 +16,8 @@ const createUser = async (req, res) => {
 
     try {
         const [user, created] = await User.findOrCreate({
-            where:{username},
-            defaults:{
+            where: { username },
+            defaults: {
                 username,
                 email,
                 password,
@@ -25,7 +25,7 @@ const createUser = async (req, res) => {
             }
         })
 
-        if(created){
+        if (created) {
             return res.status(201).json({
                 message: "User added",
                 status: 201,
