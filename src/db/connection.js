@@ -8,6 +8,7 @@ import 'dotenv/config'
 // });
 
 export const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  //Options to teh connection works
   dialectOptions: {
     ssl: {
       require: true,
