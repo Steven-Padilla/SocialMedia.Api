@@ -2,17 +2,16 @@ import app from "./app.js";
 import 'dotenv/config';
 import './models/user.model.js';
 import { sequelize } from "./db/connection.js";
+import { APP_PORT } from './config.js'
 
-// port 
-const port = 1709;
 
 const main = async () => {
 
     try {
-
-        await sequelize.sync();
-        app.listen(process.env.PORT ||port , () => {
-            console.log('Server running on port ', port)
+        
+        await sequelize.sync({alter:true});
+        app.listen(process.env.PORT || APP_PORT, () => {
+            console.log('Server running on port ', Number(APP_PORT))
         })
 
     } catch (error) {
@@ -23,5 +22,3 @@ const main = async () => {
 
 main();
 
-
-//testing change of github acount

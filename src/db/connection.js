@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize';
 import 'dotenv/config'
+import {DATABASE_URL} from '../config.js'
 
 
 // export const sequelize = new Sequelize(process.env.DB_DATABASE, process.env.DB_USER, process.env.DB_PASSWORD, {
@@ -7,7 +8,7 @@ import 'dotenv/config'
 //   dialect: 'postgres'
 // });
 
-export const sequelize = new Sequelize(process.env.DATABASE_URL, {
+export const sequelize = new Sequelize(DATABASE_URL, {
   //Options to teh connection works
   dialectOptions: {
     ssl: {

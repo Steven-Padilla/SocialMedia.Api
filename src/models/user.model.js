@@ -26,6 +26,17 @@ export const User = sequelize.define('user', {
     password: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+
+    public_image_id: {
+        type: DataTypes.STRING,
+        allowNull: true
+
+    },
+    url_image: {
+        type: DataTypes.STRING,
+        allowNull: true
+
     }
 
 })

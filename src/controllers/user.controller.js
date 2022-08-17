@@ -1,27 +1,48 @@
 import { User } from "../models/user.model.js"
+import { deleteFile, uploadFile } from '../db/cloudinary.js'
+import fs from 'fs-extra'
 
 
 const getUsers = async (req, res) => {
     try {
-        const users = await User.findAll()
+        const users = await User.findAll({
+            attributes: ['id', 'username', 'lastname', 'email', 'url_image', 'public_image_id']
+        })
         return res.json(users)
     } catch (error) {
-        res.status(500).json({ message: "Error adding data" })
+        res.status(500).json({ message: "Error getting data" })
     }
 
 }
 
 const createUser = async (req, res) => {
     const { username, email, password, lastname } = req.body
+    const image = req.files?.image
+    let imageID = "not id"
+    let imageURL = "not url"
+
+
+
 
     try {
+        if (image) {
+            const imageRes = await uploadFile(image.tempFilePath)
+            imageID = imageRes.public_id;
+            imageURL = imageRes.secure_url;
+
+        }
+
+        await fs.unlink(image.tempFilePath)
+
         const [user, created] = await User.findOrCreate({
             where: { username },
             defaults: {
                 username,
                 email,
                 password,
-                lastname
+                lastname,
+                public_image_id: imageID,
+                url_image: imageURL
             }
         })
 
@@ -75,6 +96,14 @@ const deleteUser = async (req, res) => {
     try {
         const target = await User.findByPk(id);
 
+        if (!target) {
+            return res.status(404).json({
+                message: "User not found"
+            })
+        }
+
+        const result = await deleteFile(target.public_image_id)
+        console.log(result);
         const response = await target.destroy();
 
         console.log(response);
