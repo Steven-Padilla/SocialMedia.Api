@@ -9,7 +9,7 @@ const main = async () => {
 
     try {
         
-        await sequelize.sync({alter:true});
+        await sequelize.sync({});
         app.listen(process.env.PORT || APP_PORT, () => {
             console.log('Server running on port ', Number(APP_PORT))
         })

@@ -15,6 +15,18 @@ const getUsers = async (req, res) => {
 
 }
 
+const uploadFileCLD = async (image) => {
+    try {
+        const imageRes = await uploadFile(image);
+        await fs.unlink(image)
+        return (imageRes)
+    } catch (error) {
+        res.status(500).json({ message: "Error updating photo", error })
+
+    }
+
+}
+
 const createUser = async (req, res) => {
     const { username, email, password, lastname } = req.body
     const image = req.files?.image
@@ -26,13 +38,11 @@ const createUser = async (req, res) => {
 
     try {
         if (image) {
-            const imageRes = await uploadFile(image.tempFilePath)
+            const imageRes = await uploadFileCLD(image.tempFilePath)
             imageID = imageRes.public_id;
             imageURL = imageRes.secure_url;
-
         }
 
-        await fs.unlink(image.tempFilePath)
 
         const [user, created] = await User.findOrCreate({
             where: { username },
@@ -67,16 +77,29 @@ const createUser = async (req, res) => {
 
 
 const updateUser = async (req, res) => {
-    try {
-        const { id } = req.params
-        const { username, email, password, lastname } = req.body
-        const target = await User.findByPk(id)
+    const { id } = req.params
+    const { username, email, password, lastname } = req.body
+    const target = await User.findByPk(id)
+    const image = req.files?.image
 
+
+    try {
+        !target ? (res.status(404).json({ message: "User not found to update" })) : null;
+
+        if (image) {
+            if(target.public_image_id!=null){
+                await deleteFile(target.public_image_id)
+            }
+            const imageRes = await uploadFileCLD(image.tempFilePath);
+            target.public_image_id = imageRes.public_id;
+            target.url_image = imageRes.secure_url;
+        }
 
         username ? (target.username = username) : null
         email ? (target.email = email) : null
         password ? (target.password = password) : null
         lastname ? (target.lastname = lastname) : null
+
 
         const result = await target.save()
 
@@ -85,7 +108,8 @@ const updateUser = async (req, res) => {
             data: result
         })
     } catch (error) {
-        res.status(500).json({ message: "Error updating data" })
+        res.status(500).json({message:"Algo falló al actualizar",data:error})
+        console.log("Error updating data")
     }
 }
 
@@ -94,7 +118,9 @@ const deleteUser = async (req, res) => {
     const { id } = req.params
 
     try {
-        const target = await User.findByPk(id);
+        const target = await User.findByPk(id,{
+            attributes: ['id', 'username', 'lastname', 'email', 'url_image', 'public_image_id']
+        });
 
         if (!target) {
             return res.status(404).json({
@@ -124,7 +150,9 @@ const getSingleUSer = async (req, res) => {
     const { id } = req.params
 
     try {
-        const user = await User.findByPk(id)
+        const user = await User.findByPk(id,{
+            attributes: ['id', 'username', 'lastname', 'email', 'url_image', 'public_image_id']
+        })
         user ?
             res.json({
                 message: "User found",
